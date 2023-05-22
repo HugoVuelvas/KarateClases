@@ -1,0 +1,85 @@
+﻿@page "/alumnos"
+@inject HttpClient http
+@inject NavigationManager navigate
+
+<h2>Alumnos</h2>
+
+<button class="btn btn-primary" @onclick="Agregar"><span class="oi oi-plus"></span> Agregar</button>
+
+@if(losAlumnos == null)
+{
+    <div class="text-center">
+        <div class="spinner-border m-5 text-primary" style="width: 10rem; height: 10rem; border-width: 1rem" role="status">   
+        </div>
+    </div>
+}
+else if(losAlumnos.Count == 0)
+{
+    <div class="text-center">
+        <div class="m-5">
+            <h1 class="text-danger">No hay ningun alumno registrado</h1>
+        </div>
+    </div>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Edad</th>
+                <th>Genero</th>
+                <th>Dojo</th>
+                <th>Grado</th>
+                <th>Tutor</th>
+                <th>Telefono</th>
+                <th> </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var elAlumno in losAlumnos)
+            {
+                <tr>
+                    <td>@elAlumno.Id</td>
+                    <td>@elAlumno.Nombre</td>
+                    <td>@elAlumno.Edad</td>
+                    <td>@elAlumno.Genero</td>
+                    <td>@elAlumno.Dojo</td>
+                    <td>@elAlumno.Grado</td>
+                    <td>@elAlumno.Tutor</td>
+                    <td>@elAlumno.Telefono</td>
+                    <td>
+                        <button class="btn-sm btn-secondary" @onclick="()=>Editar(elAlumno.Id)" ><span class="oi oi-pencil"></span></button>
+                        <button class="btn-sm btn-danger" @onclick="()=>Eliminar(elAlumno)" ><span class="oi oi-trash"></span></button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Alumno> losAlumnos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        losAlumnos = await http.GetFromJsonAsync<List<Alumno>>("api/alumnos"); 
+    }
+
+    private void Agregar()
+    {
+        navigate.NavigateTo("/alumnos/nuevo");
+    }
+
+    private void Editar(int id)
+    {
+        navigate.NavigateTo($"/alumnos/editar/{id}");
+    }
+
+    private async Task Eliminar(Alumno unAlumno)
+    {
+        await http.DeleteAsync($"api/alumnos/{unAlumno.Id}");
+        losAlumnos.Remove(unAlumno);
+    }
+}

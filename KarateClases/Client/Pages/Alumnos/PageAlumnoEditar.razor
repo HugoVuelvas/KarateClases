@@ -1,0 +1,75 @@
+﻿@page "/alumnos/editar/{Id:int}"
+@inject HttpClient http
+@inject NavigationManager navigate
+
+
+<h3>Editar Alumno</h3>
+
+<EditForm Model="elAlumno" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label for="txtNombre" class="form-label"><b>Nombre</b></label>
+        <InputText class="form-control" id="txtNombre" @bind-Value="elAlumno.Nombre" />
+        <ValidationMessage For="@(() => elAlumno.Nombre)" />
+    </div>
+    <div class="mb-3">
+        <label for="txtEdad" class="form-label"><b>Edad</b></label>
+        <InputNumber class="form-control" id="txtEdad" @bind-Value="elAlumno.Edad" />
+        <ValidationMessage For="@(() => elAlumno.Edad)" />
+    </div>
+    <label for="txtGenero" class="col-sm-2 col-form-label"><b>Genero</b></label>
+    <div class="col-sm-10">
+        <InputRadioGroup @bind-Value="elAlumno.Genero">
+            <label><InputRadio Value="2" /> Hombre</label>
+            <label><InputRadio Value="1" /> Mujer</label>
+        </InputRadioGroup>
+        <ValidationMessage For="@(() => elAlumno.Genero)" />
+    </div>
+    <label for="txtDojo" class="col-sm-2 col-form-label"><b>Dojo</b></label>
+    <div class="col-sm-10">
+        <InputRadioGroup @bind-Value="elAlumno.Dojo">
+            <label><InputRadio Value="2" /> Ramon Serrano</label>
+            <label><InputRadio Value="1" /> Centro</label>
+        </InputRadioGroup>
+        <ValidationMessage For="@(() => elAlumno.Dojo)" />
+    </div>
+    <div class="mb-3">
+        <label for="txtGrado" class="form-label"><b>Grado</b></label>
+        <InputText class="form-control" id="txtGrado" @bind-Value="elAlumno.Grado" />
+        <ValidationMessage For="@(() => elAlumno.Grado)" />
+    </div>
+    <div class="mb-3">
+        <label for="txtTutor" class="form-label"><b>Tutor</b></label>
+        <InputNumber class="form-control" id="txtTutor" @bind-Value="elAlumno.Tutor" />
+        <ValidationMessage For="@(() => elAlumno.Tutor)" />
+    </div>
+    <div class="mb-3">
+        <label for="txtTelefono" class="form-label"><b>Telefono</b></label>
+        <InputText class="form-control" id="txtTelefono" @bind-Value="elAlumno.Telefono" />
+        <ValidationMessage For="@(() => elAlumno.Telefono)" />
+    </div>
+    <button class="btn btn-primary" type="submit"> Guardar </button>
+    <button class="btn btn-danger" @onclick="Cancelar"> Cancelar </button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private Alumno elAlumno = new Alumno();
+
+    protected override async Task OnInitializedAsync()
+    {
+        elAlumno = await http.GetFromJsonAsync<Alumno>($"api/alumnos/{Id}");
+    }
+
+    private async void Guardar()
+    {
+        await http.PutAsJsonAsync($"api/alumnos/{Id}", elAlumno);
+        Cancelar();
+    }
+
+    private async void Cancelar()
+    {
+        navigate.NavigateTo("/alumnos");
+    }
+}
